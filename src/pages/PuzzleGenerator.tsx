@@ -1,5 +1,7 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useToast } from '../lib/toast'
+import { useAuth } from '../lib/auth'
+import { supabase } from '../lib/supabase'
 import { generateWordSearch, generateSudoku, generateMaze } from '../lib/puzzles'
 import { downloadInteriorPDF } from '../lib/pdf'
 import { PUZZLE_TYPES, DIFFICULTY_LEVELS, KDP_TRIM_SIZES } from '../lib/constants'
@@ -8,14 +10,25 @@ import { Download, RefreshCw, Eye, Grid3x3 } from 'lucide-react'
 
 export default function PuzzleGenerator() {
   const { notify } = useToast()
+  const { user } = useAuth()
   const [puzzleType, setPuzzleType] = useState('wordsearch')
   const [difficulty, setDifficulty] = useState('easy')
   const [pageCount, setPageCount] = useState(60)
   const [trimSize, setTrimSize] = useState('8.5x11')
   const [largePrint, setLargePrint] = useState(false)
   const [gridSize, setGridSize] = useState(9)
+  const [title, setTitle] = useState('')
+  const [author, setAuthor] = useState('')
   const [wordListText, setWordListText] = useState('PUZZLE\nBOOK\nWORD\nSEARCH\nFIND\nHIDDEN\nLETTER\nGRID')
   const [seed, setSeed] = useState(0)
+
+  useEffect(() => {
+    (async () => {
+      if (!user) return
+      const { data } = await supabase.from('profiles').select('display_name').eq('id', user.id).maybeSingle()
+      setAuthor(data?.display_name ?? '')
+    })()
+  }, [user])
 
   const wordList = useMemo(() => wordListText.split('\n').map((w) => w.trim()).filter(Boolean), [wordListText])
 
@@ -28,7 +41,8 @@ export default function PuzzleGenerator() {
   }, [puzzleType, difficulty, largePrint, gridSize, seed])
 
   const handleExport = () => {
-    downloadInteriorPDF({ puzzleType, difficulty, pageCount, trimSize, largePrint, theme: 'general', title: 'Sample Puzzle Book', author: 'Author Name', gridSize, wordList })
+    if (!title.trim()) { notify('Please enter a book title before exporting.', 'error'); return }
+    downloadInteriorPDF({ puzzleType, difficulty, pageCount, trimSize, largePrint, theme: 'general', title: title.trim(), author: author.trim(), gridSize, wordList })
     notify('Interior PDF exported.', 'success')
   }
 
@@ -45,6 +59,8 @@ export default function PuzzleGenerator() {
             {puzzleType === 'sudoku' && (<div><label className="label">Grid Size</label><select className="input" value={gridSize} onChange={(e) => setGridSize(Number(e.target.value))}><option value={4}>4\u00d74 (Kids)</option><option value={9}>9\u00d79 (Standard)</option></select></div>)}
             <div><label className="label">Page Count</label><input type="number" min={24} max={500} className="input" value={pageCount} onChange={(e) => setPageCount(Number(e.target.value))} /></div>
             <div><label className="label">Trim Size</label><select className="input" value={trimSize} onChange={(e) => setTrimSize(e.target.value)}>{KDP_TRIM_SIZES.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}</select></div>
+            <div><label className="label">Book Title</label><input className="input" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Large Print Word Search for Adults" /></div>
+            <div><label className="label">Author Name</label><input className="input" value={author} onChange={(e) => setAuthor(e.target.value)} placeholder="Your author name" /></div>
             <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={largePrint} onChange={(e) => setLargePrint(e.target.checked)} className="rounded" /><span className="text-sm text-fg-soft">Large Print</span></label>
             {puzzleType === 'wordsearch' && (<div><label className="label">Word List (one per line)</label><textarea className="input min-h-[120px] font-mono text-xs" value={wordListText} onChange={(e) => setWordListText(e.target.value)} /></div>)}
           </div>

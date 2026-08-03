@@ -8,12 +8,12 @@ import { Project } from '../lib/types'
 import { Spinner } from '../components/ui'
 import { downloadInteriorPDF, downloadCoverPDF } from '../lib/pdf'
 import { validateCompliance, runQualityChecks } from '../lib/validators'
-import { generateMetadata } from '../lib/metadata'
-import { CircleCheck as CheckCircle2, Circle, Clock, ChevronRight, ArrowLeft, Download, FileText, ShieldCheck, Gauge, Save, History } from 'lucide-react'
+import { generateMetadata, generateMetadataWithAI } from '../lib/metadata'
+import { CircleCheck as CheckCircle2, Circle, Clock, ChevronRight, ArrowLeft, Download, FileText, ShieldCheck, Gauge, Save, History, Sparkles } from 'lucide-react'
 
 export default function ProjectDetail() {
   const { id } = useParams<{ id: string }>()
-  const { user } = useAuth()
+  const { user, session } = useAuth()
   const { notify } = useToast()
   const [project, setProject] = useState<Project | null>(null)
   const [loading, setLoading] = useState(true)
@@ -101,10 +101,21 @@ export default function ProjectDetail() {
     notify(`Quality score: ${quality.score}/100`, 'success')
   }
 
+  const [generatingMeta, setGeneratingMeta] = useState(false)
+
   const generateMeta = async () => {
-    const meta = generateMetadata({ topic: project.title, bookType: project.book_type, audience: project.config.audience ?? 'adult', difficulty: project.config.difficulty ?? 'easy' })
-    await saveProject({ metadata: { ...project.metadata, ...meta } }, 'Generated metadata')
-    notify('Metadata generated.', 'success')
+    setGeneratingMeta(true)
+    try {
+      const meta = await generateMetadataWithAI({ topic: project.title, bookType: project.book_type, audience: project.config.audience ?? 'adult', difficulty: project.config.difficulty ?? 'easy', accessToken: session?.access_token ?? null })
+      await saveProject({ metadata: { ...project.metadata, ...meta } }, 'Generated metadata with AI')
+      notify('AI metadata generated.', 'success')
+    } catch (err: any) {
+      notify('AI generation failed, using template. ' + (err.message ?? ''), 'error')
+      const meta = generateMetadata({ topic: project.title, bookType: project.book_type, audience: project.config.audience ?? 'adult', difficulty: project.config.difficulty ?? 'easy' })
+      await saveProject({ metadata: { ...project.metadata, ...meta } }, 'Generated metadata')
+    } finally {
+      setGeneratingMeta(false)
+    }
   }
 
   return (
@@ -162,7 +173,7 @@ export default function ProjectDetail() {
 
         <StageContent
           stageId={project.current_stage} project={project} exportConfig={exportConfig} coverConfig={coverConfig}
-          complianceIssues={complianceIssues} quality={quality}
+          complianceIssues={complianceIssues} quality={quality} generatingMeta={generatingMeta}
           onRunCompliance={runCompliance} onRunQuality={runQuality} onGenerateMeta={generateMeta}
           onDownloadInterior={() => { downloadInteriorPDF(exportConfig); supabase.from('activity_log').insert({ user_id: user!.id, project_id: project.id, action: 'Exported interior PDF', detail: project.title }) }}
           onDownloadCover={() => { downloadCoverPDF(coverConfig); supabase.from('activity_log').insert({ user_id: user!.id, project_id: project.id, action: 'Exported cover PDF', detail: project.title }) }}
@@ -178,7 +189,7 @@ export default function ProjectDetail() {
   )
 }
 
-function StageContent({ stageId, project, exportConfig, coverConfig, complianceIssues, quality, onRunCompliance, onRunQuality, onGenerateMeta, onDownloadInterior, onDownloadCover }: any) {
+function StageContent({ stageId, project, exportConfig, coverConfig, complianceIssues, quality, generatingMeta, onRunCompliance, onRunQuality, onGenerateMeta, onDownloadInterior, onDownloadCover }: any) {
   switch (stageId) {
     case 'market-research':
       return <div className="space-y-3"><p className="text-sm text-fg-soft">Research the Amazon marketplace for opportunities. Visit the Market Research tool for detailed analysis.</p><Link to="/market-research" className="btn-primary inline-flex">Open Market Research</Link>
@@ -209,8 +220,8 @@ function StageContent({ stageId, project, exportConfig, coverConfig, complianceI
         <Link to="/cover-creator" className="btn-primary inline-flex">Open Cover Creator</Link>
         <button onClick={onDownloadCover} className="btn-outline"><Download className="w-4 h-4" /> Preview Cover PDF</button></div>
     case 'metadata-creation':
-      return <div className="space-y-3"><p className="text-sm text-fg-soft">Generate optimized metadata \u2014 title, description, keywords, and categories.</p>
-        <button onClick={onGenerateMeta} className="btn-primary"><FileText className="w-4 h-4" /> Generate Metadata</button>
+      return <div className="space-y-3"><p className="text-sm text-fg-soft">Generate optimized metadata with AI \u2014 title, description, keywords, and categories.</p>
+        <button onClick={onGenerateMeta} disabled={generatingMeta} className="btn-primary"><Sparkles className="w-4 h-4" /> {generatingMeta ? 'Generating...' : 'Generate AI Metadata'}</button>
         {project.metadata?.title && (
           <div className="mt-4 space-y-2 text-sm">
             <div><span className="text-fg-muted">Title:</span> <span className="text-fg">{project.metadata.title}</span></div>

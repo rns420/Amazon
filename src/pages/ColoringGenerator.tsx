@@ -1,5 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useToast } from '../lib/toast'
+import { useAuth } from '../lib/auth'
+import { supabase } from '../lib/supabase'
 import { COLORING_THEMES, KDP_TRIM_SIZES } from '../lib/constants'
 import { downloadColoringPDF } from '../lib/pdf'
 import { PageHeader } from '../components/ui'
@@ -9,22 +11,33 @@ const AUDIENCES = [{ id: 'children', label: 'Children' }, { id: 'adult', label: 
 
 export default function ColoringGenerator() {
   const { notify } = useToast()
+  const { user } = useAuth()
   const [theme, setTheme] = useState('mandala')
   const [audience, setAudience] = useState('adult')
   const [pageCount, setPageCount] = useState(50)
   const [trimSize, setTrimSize] = useState('8.5x8.5')
   const [singleSided, setSingleSided] = useState(true)
+  const [title, setTitle] = useState('')
+  const [author, setAuthor] = useState('')
   const [seed, setSeed] = useState(0)
   const [exporting, setExporting] = useState(false)
+
+  useEffect(() => {
+    (async () => {
+      if (!user) return
+      const { data } = await supabase.from('profiles').select('display_name').eq('id', user.id).maybeSingle()
+      setAuthor(data?.display_name ?? '')
+    })()
+  }, [user])
   const patterns = generateColoringPattern(theme, seed)
 
   const handleExport = () => {
+    if (!title.trim()) { notify('Please enter a book title before exporting.', 'error'); return }
     setExporting(true)
     try {
       downloadColoringPDF({
         theme, pageCount, trimSize, largePrint: audience === 'children',
-        singleSided, title: `${COLORING_THEMES.find((t) => t.id === theme)?.label} Coloring Book`,
-        author: 'Author Name',
+        singleSided, title: title.trim(), author: author.trim(),
       })
       notify('Coloring book PDF exported.', 'success')
     } catch {
@@ -46,6 +59,8 @@ export default function ColoringGenerator() {
             <div><label className="label">Audience</label><select className="input" value={audience} onChange={(e) => setAudience(e.target.value)}>{AUDIENCES.map((a) => <option key={a.id} value={a.id}>{a.label}</option>)}</select></div>
             <div><label className="label">Page Count</label><input type="number" min={24} max={200} className="input" value={pageCount} onChange={(e) => setPageCount(Number(e.target.value))} /></div>
             <div><label className="label">Trim Size</label><select className="input" value={trimSize} onChange={(e) => setTrimSize(e.target.value)}>{KDP_TRIM_SIZES.filter((t) => t.bleed).map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}</select></div>
+            <div><label className="label">Book Title</label><input className="input" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Mandala Coloring Book for Adults" /></div>
+            <div><label className="label">Author Name</label><input className="input" value={author} onChange={(e) => setAuthor(e.target.value)} placeholder="Your author name" /></div>
             <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={singleSided} onChange={(e) => setSingleSided(e.target.checked)} className="rounded" /><span className="text-sm text-fg-soft">Single-sided pages</span></label>
           </div>
           <button onClick={() => setSeed((s) => s + 1)} className="btn-outline w-full"><RefreshCw className="w-4 h-4" /> Regenerate Preview</button>

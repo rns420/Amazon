@@ -1,5 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useToast } from '../lib/toast'
+import { useAuth } from '../lib/auth'
+import { supabase } from '../lib/supabase'
 import { KDP_TRIM_SIZES, trimById, PAPERBACK_BLEED, calculateSpineWidth, canHaveSpineText } from '../lib/constants'
 import { downloadCoverPDF } from '../lib/pdf'
 import { validateCoverCompliance } from '../lib/validators'
@@ -11,20 +13,30 @@ const COLORS = ['#3478f6', '#f97316', '#22c55e', '#dc2626', '#7c3aed', '#0891b2'
 
 export default function CoverCreator() {
   const { notify } = useToast()
+  const { user } = useAuth()
   const [trimSize, setTrimSize] = useState('6x9')
-  const [title, setTitle] = useState('My Awesome Book')
-  const [subtitle, setSubtitle] = useState('A Guide to Something Great')
-  const [author, setAuthor] = useState('Author Name')
+  const [title, setTitle] = useState('')
+  const [subtitle, setSubtitle] = useState('')
+  const [author, setAuthor] = useState('')
   const [primaryColor, setPrimaryColor] = useState('#3478f6')
   const [theme, setTheme] = useState('minimal')
   const [pageCount, setPageCount] = useState(100)
+
+  useEffect(() => {
+    (async () => {
+      if (!user) return
+      const { data } = await supabase.from('profiles').select('display_name').eq('id', user.id).maybeSingle()
+      setAuthor(data?.display_name ?? '')
+    })()
+  }, [user])
 
   const trim = trimById(trimSize)
   const spineWidth = calculateSpineWidth(pageCount)
   const issues = validateCoverCompliance({ trimSize, title, author, subtitle, primaryColor, pageCount, theme })
 
   const handleExport = () => {
-    downloadCoverPDF({ trimSize, title, author, subtitle, primaryColor, pageCount, theme })
+    if (!title.trim()) { notify('Please enter a title before exporting.', 'error'); return }
+    downloadCoverPDF({ trimSize, title: title.trim(), author: author.trim(), subtitle: subtitle.trim(), primaryColor, pageCount, theme })
     notify('Cover PDF exported.', 'success')
   }
 
@@ -98,7 +110,7 @@ function CoverPreview({ trimSize, title, subtitle, author, primaryColor, theme, 
       <div className="bg-white border-r border-border-soft flex items-center justify-center" style={{ width: fw, height: fh }}>
         <div className="text-center px-4">
           <div className="text-[10px] text-slate-400 mb-2">Back Cover</div>
-          <div className="text-[9px] text-slate-500 leading-relaxed">{subtitle || 'Book description goes here on the back cover...'}</div>
+          <div className="text-[9px] text-slate-500 leading-relaxed">{subtitle || 'Enter a subtitle or back-cover description in the form on the left.'}</div>
           <div className="mt-auto pt-4"><div className="w-16 h-10 border border-slate-300 rounded mx-auto" /><div className="text-[7px] text-slate-400 mt-1">Barcode</div></div>
         </div>
       </div>
