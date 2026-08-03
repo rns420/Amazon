@@ -131,9 +131,10 @@ Return 5 competitors. Return ONLY the JSON, no other text.`;
   return "Invalid research type.";
 }
 
+// Research edge function — OpenRouter AI with primary + free fallback
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const PRIMARY_MODEL = "anthropic/claude-3.5-sonnet";
-const FALLBACK_MODEL = "google/gemini-flash-1.5";
+const PRIMARY_MODEL = "google/gemini-2.5-flash-lite";
+const FALLBACK_MODEL = "openrouter/free";
 
 async function callOpenRouter(prompt: string, model: string): Promise<string> {
   const apiKey = Deno.env.get("OPENROUTER_API_KEY");
@@ -151,7 +152,7 @@ async function callOpenRouter(prompt: string, model: string): Promise<string> {
       model,
       max_tokens: 4096,
       messages: [{ role: "user", content: prompt }],
-      response_format: { type: "json_object" },
+      temperature: 0.7,
     }),
   });
 
@@ -168,11 +169,17 @@ async function callOpenRouter(prompt: string, model: string): Promise<string> {
 }
 
 async function callAI(prompt: string): Promise<string> {
+  let primaryErr = "";
   try {
     return await callOpenRouter(prompt, PRIMARY_MODEL);
-  } catch (primaryErr) {
-    console.log(`Primary model (${PRIMARY_MODEL}) failed: ${primaryErr.message}. Falling back to ${FALLBACK_MODEL}.`);
+  } catch (err) {
+    primaryErr = err.message;
+    console.log(`Primary model (${PRIMARY_MODEL}) failed: ${primaryErr}. Falling back to ${FALLBACK_MODEL}.`);
+  }
+  try {
     return await callOpenRouter(prompt, FALLBACK_MODEL);
+  } catch (fallbackErr) {
+    throw new Error(`Primary (${PRIMARY_MODEL}): ${primaryErr} | Fallback (${FALLBACK_MODEL}): ${fallbackErr.message}`);
   }
 }
 
@@ -182,7 +189,20 @@ function extractJSON(text: string): any {
   const jsonEnd = cleaned.lastIndexOf("}");
   if (jsonStart === -1 || jsonEnd === -1) throw new Error("AI response does not contain valid JSON");
   const jsonStr = cleaned.substring(jsonStart, jsonEnd + 1);
-  return JSON.parse(jsonStr);
+  try {
+    return JSON.parse(jsonStr);
+  } catch {
+    const fixed = jsonStr
+      .replace(/,\s*}/g, "}")
+      .replace(/,\s*]/g, "]")
+      .replace(/[\u201C\u201D]/g, '"')
+      .replace(/[\u2018\u2019]/g, "'");
+    try {
+      return JSON.parse(fixed);
+    } catch {
+      throw new Error("AI returned malformed JSON that could not be parsed");
+    }
+  }
 }
 
 Deno.serve(async (req: Request) => {
