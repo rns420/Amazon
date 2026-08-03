@@ -17,13 +17,9 @@ export const KDP_TRIM_SIZES: { id: string; label: string; w: number; h: number; 
   { id: '8.27x11.69', label: '8.27" x 11.69" (A4)', w: 8.27, h: 11.69, bleed: true },
 ]
 
-export const PAPERBACK_BLEED = 0.125 // inches added to each outer edge
+export const PAPERBACK_BLEED = 0.125
 
-export interface WorkflowStage {
-  id: string
-  label: string
-  description: string
-}
+export interface WorkflowStage { id: string; label: string; description: string }
 
 export const WORKFLOW_STAGES: WorkflowStage[] = [
   { id: 'market-research', label: 'Market Research', description: 'Research the Amazon marketplace for opportunities.' },

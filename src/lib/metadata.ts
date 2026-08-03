@@ -13,12 +13,12 @@ export function generateMetadata(opts: {
 
   const title = `${topicTitle} ${typeLabel} for ${audLabel}`
   const subtitle = `${difficulty === 'easy' ? 'Easy' : difficulty === 'hard' ? 'Challenging' : 'Medium'} ${typeLabel} with Solutions`
-  const short = `${topicTitle} ${typeLabel} — ${difficulty} puzzles with solutions.`
+  const short = `${topicTitle} ${typeLabel} \u2014 ${difficulty} puzzles with solutions.`
   const description = `Discover hours of fun with this ${difficulty} ${topicTitle.toLowerCase()} ${typeLabel.toLowerCase()} designed for ${audLabel.toLowerCase()}. ` +
     `Packed with engaging puzzles, this book offers a perfect blend of entertainment and brain training. ` +
     `Every puzzle includes a solution, making it ideal for both solo enjoyment and group activities. ` +
     `Large print format ensures comfortable solving. Perfect for gifts, travel, and daily relaxation. ` +
-    `Features:\n\n• ${difficulty === 'easy' ? '100+' : '50+'} carefully crafted puzzles\n• Complete solutions included\n• Large, clear print\n• Single-sided pages\n• Premium matte finish cover\n\nOrder your copy today and start solving!`
+    `Features:\n\n\u2022 ${difficulty === 'easy' ? '100+' : '50+'} carefully crafted puzzles\n\u2022 Complete solutions included\n\u2022 Large, clear print\n\u2022 Single-sided pages\n\u2022 Premium matte finish cover\n\nOrder your copy today and start solving!`
 
   const keywords = [
     topic.toLowerCase(),
@@ -36,26 +36,16 @@ export function generateMetadata(opts: {
   ]
 
   const categories = bookType === 'coloring'
-    ? ['Crafts, Hobbies & Home › Crafts & Hobbies › Coloring Books for Grown-Ups', 'Children\'s Books › Activities, Crafts & Games › Activity Books']
-    : ['Humor & Entertainment › Puzzles & Games › Sudoku', 'Humor & Entertainment › Puzzles & Games › Word Games']
+    ? ['Crafts, Hobbies & Home \u203a Crafts & Hobbies \u203a Coloring Books for Grown-Ups', "Children's Books \u203a Activities, Crafts & Games \u203a Activity Books"]
+    : ['Humor & Entertainment \u203a Puzzles & Games \u203a Sudoku', 'Humor & Entertainment \u203a Puzzles & Games \u203a Word Games']
 
-  const bisac = bookType === 'coloring'
-    ? ['GAM007000', 'CRA026000']
-    : ['GAM005000', 'GAM006000']
+  const bisac = bookType === 'coloring' ? ['GAM007000', 'CRA026000'] : ['GAM005000', 'GAM006000']
 
   return {
-    title,
-    subtitle,
-    description,
-    short_description: short,
-    author: '',
-    series: '',
-    edition: '1st',
-    language: 'English',
+    title, subtitle, description, short_description: short,
+    author: '', series: '', edition: '1st', language: 'English',
     reading_age: audience === 'children' ? '8-12 years' : 'All ages',
     audience: audience === 'children' ? 'Children' : audience === 'adult' ? 'Adult' : 'General',
-    keywords,
-    categories,
-    bisac,
+    keywords, categories, bisac,
   }
 }

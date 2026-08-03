@@ -5,7 +5,7 @@ import { useAuth } from '../lib/auth'
 import { PageHeader, StatCard, EmptyState, Spinner } from '../components/ui'
 import { WORKFLOW_STAGES } from '../lib/constants'
 import { Project, ActivityEntry } from '../lib/types'
-import { FolderKanban, BookCheck, File as FileEdit, Rocket, Plus, ArrowRight, Activity, CircleCheck as CheckCircle2, Clock, CircleAlert as AlertCircle } from 'lucide-react'
+import { FolderKanban, BookCheck, FileEdit, Rocket, Plus, ArrowRight, Activity, CheckCircle2, Clock } from 'lucide-react'
 
 export default function Dashboard() {
   const { user } = useAuth()
@@ -29,19 +29,14 @@ export default function Dashboard() {
   const drafts = projects.filter((p) => p.status === 'draft')
   const completed = projects.filter((p) => p.status === 'completed')
   const ready = projects.filter((p) => p.status === 'ready')
-
   const stageLabel = (id: string) => WORKFLOW_STAGES.find((s) => s.id === id)?.label ?? id
 
   return (
     <div className="p-6 lg:p-8 max-w-7xl mx-auto animate-fade-in">
       <PageHeader
-        title={`Welcome back`}
+        title="Welcome back"
         subtitle="Your KDP publishing command center"
-        actions={
-          <button onClick={() => navigate('/projects')} className="btn-primary">
-            <Plus className="w-4 h-4" /> New Project
-          </button>
-        }
+        actions={<button onClick={() => navigate('/projects')} className="btn-primary"><Plus className="w-4 h-4" /> New Project</button>}
       />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -52,23 +47,16 @@ export default function Dashboard() {
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
-        {/* Recent projects */}
         <div className="lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-semibold text-fg">Recent Projects</h2>
-            <Link to="/projects" className="text-sm text-brand-600 hover:underline flex items-center gap-1">
-              View all <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
+            <Link to="/projects" className="text-sm text-brand-600 hover:underline flex items-center gap-1">View all <ArrowRight className="w-3.5 h-3.5" /></Link>
           </div>
           {loading ? (
             <div className="card p-10"><Spinner /></div>
           ) : projects.length === 0 ? (
-            <EmptyState
-              icon={<FolderKanban className="w-7 h-7" />}
-              title="No projects yet"
-              message="Create your first KDP book project to get started."
-              action={<button onClick={() => navigate('/projects')} className="btn-primary"><Plus className="w-4 h-4" /> Create Project</button>}
-            />
+            <EmptyState icon={<FolderKanban className="w-7 h-7" />} title="No projects yet" message="Create your first KDP book project to get started."
+              action={<button onClick={() => navigate('/projects')} className="btn-primary"><Plus className="w-4 h-4" /> Create Project</button>} />
           ) : (
             <div className="space-y-3">
               {projects.map((p) => {
@@ -79,20 +67,13 @@ export default function Dashboard() {
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <div className="font-medium text-fg truncate">{p.title}</div>
-                        <div className="text-sm text-fg-muted mt-0.5">
-                          {p.book_type === 'puzzle' ? 'Puzzle Book' : 'Coloring Book'} · {stageLabel(p.current_stage)}
-                        </div>
+                        <div className="text-sm text-fg-muted mt-0.5">{p.book_type === 'puzzle' ? 'Puzzle Book' : 'Coloring Book'} \u00b7 {stageLabel(p.current_stage)}</div>
                       </div>
                       <StatusBadge status={p.status} />
                     </div>
                     <div className="mt-3">
-                      <div className="flex items-center justify-between text-xs text-fg-muted mb-1">
-                        <span>Workflow progress</span>
-                        <span>{progress}%</span>
-                      </div>
-                      <div className="h-1.5 bg-bg-soft rounded-full overflow-hidden">
-                        <div className="h-full bg-brand-500 rounded-full transition-all" style={{ width: `${progress}%` }} />
-                      </div>
+                      <div className="flex items-center justify-between text-xs text-fg-muted mb-1"><span>Workflow progress</span><span>{progress}%</span></div>
+                      <div className="h-1.5 bg-bg-soft rounded-full overflow-hidden"><div className="h-full bg-brand-500 rounded-full transition-all" style={{ width: `${progress}%` }} /></div>
                     </div>
                   </Link>
                 )
@@ -101,7 +82,6 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* Activity */}
         <div>
           <h2 className="font-semibold text-fg mb-4">Recent Activity</h2>
           {activity.length === 0 ? (
@@ -110,9 +90,7 @@ export default function Dashboard() {
             <div className="card divide-y divide-border-soft">
               {activity.map((a) => (
                 <div key={a.id} className="p-3.5 flex gap-3">
-                  <div className="w-8 h-8 rounded-full bg-bg-soft flex items-center justify-center shrink-0">
-                    <Activity className="w-4 h-4 text-fg-muted" />
-                  </div>
+                  <div className="w-8 h-8 rounded-full bg-bg-soft flex items-center justify-center shrink-0"><Activity className="w-4 h-4 text-fg-muted" /></div>
                   <div className="min-w-0">
                     <div className="text-sm text-fg">{a.action}</div>
                     {a.detail && <div className="text-xs text-fg-muted truncate">{a.detail}</div>}
@@ -128,10 +106,10 @@ export default function Dashboard() {
             <div className="space-y-2">
               {[
                 { label: 'Market research', done: projects.some((p) => p.current_stage !== 'market-research') },
-                { label: 'Interior created', done: projects.some((p) => ['interior-creation', 'cover-creation', 'metadata-creation', 'quality-validation', 'compliance-validation', 'export', 'ready-for-kdp'].includes(p.current_stage)) },
-                { label: 'Cover designed', done: projects.some((p) => ['cover-creation', 'metadata-creation', 'quality-validation', 'compliance-validation', 'export', 'ready-for-kdp'].includes(p.current_stage)) },
-                { label: 'Metadata written', done: projects.some((p) => ['metadata-creation', 'quality-validation', 'compliance-validation', 'export', 'ready-for-kdp'].includes(p.current_stage)) },
-                { label: 'Book exported', done: projects.some((p) => ['export', 'ready-for-kdp'].includes(p.current_stage)) },
+                { label: 'Interior created', done: projects.some((p) => ['interior-creation','cover-creation','metadata-creation','quality-validation','compliance-validation','export','ready-for-kdp'].includes(p.current_stage)) },
+                { label: 'Cover designed', done: projects.some((p) => ['cover-creation','metadata-creation','quality-validation','compliance-validation','export','ready-for-kdp'].includes(p.current_stage)) },
+                { label: 'Metadata written', done: projects.some((p) => ['metadata-creation','quality-validation','compliance-validation','export','ready-for-kdp'].includes(p.current_stage)) },
+                { label: 'Book exported', done: projects.some((p) => ['export','ready-for-kdp'].includes(p.current_stage)) },
               ].map((item) => (
                 <div key={item.label} className="flex items-center gap-2 text-sm">
                   {item.done ? <CheckCircle2 className="w-4 h-4 text-success-500" /> : <Clock className="w-4 h-4 text-fg-muted" />}

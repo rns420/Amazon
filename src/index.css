@@ -23,7 +23,6 @@
 }
 
 * { border-color: rgb(var(--border)); }
-
 html, body, #root { height: 100%; }
 body {
   background-color: rgb(var(--bg));
@@ -38,20 +37,12 @@ body {
 ::-webkit-scrollbar-thumb:hover { background: rgb(var(--fg-muted)); }
 
 @layer components {
-  .card {
-    @apply bg-bg rounded-xl border border-border shadow-card;
-  }
-  .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all disabled:opacity-50 disabled:pointer-events-none;
-  }
+  .card { @apply bg-bg rounded-xl border border-border shadow-card; }
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all disabled:opacity-50 disabled:pointer-events-none; }
   .btn-primary { @apply btn bg-brand-600 text-white hover:bg-brand-700; }
   .btn-ghost { @apply btn text-fg-soft hover:bg-bg-soft; }
   .btn-outline { @apply btn border border-border text-fg hover:bg-bg-soft; }
-  .input {
-    @apply w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-fg outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20;
-  }
+  .input { @apply w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-fg outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20; }
   .label { @apply block text-sm font-medium text-fg-soft mb-1.5; }
-  .badge {
-    @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium;
-  }
+  .badge { @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium; }
 }

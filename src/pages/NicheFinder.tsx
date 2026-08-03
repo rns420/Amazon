@@ -25,44 +25,23 @@ export default function NicheFinder() {
 
       <div className="relative mb-6">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fg-muted" />
-        <input className="input pl-9" placeholder="Search niche ideas…" value={query} onChange={(e) => setQuery(e.target.value)} />
+        <input className="input pl-9" placeholder="Search niche ideas\u2026" value={query} onChange={(e) => setQuery(e.target.value)} />
       </div>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {filtered.map((n) => (
           <div key={n.name} className="card p-5 hover:shadow-pop transition">
-            <div className="flex items-start justify-between gap-2 mb-3">
-              <h3 className="font-semibold text-fg text-sm leading-snug">{n.name}</h3>
-              <span className="badge bg-brand-50 text-brand-700 shrink-0">{n.score}</span>
-            </div>
+            <div className="flex items-start justify-between gap-2 mb-3"><h3 className="font-semibold text-fg text-sm leading-snug">{n.name}</h3><span className="badge bg-brand-50 text-brand-700 shrink-0">{n.score}</span></div>
             <div className="text-xs text-fg-muted mb-3">{n.bookType}</div>
             <div className="space-y-1.5 text-xs">
-              <div className="flex items-center justify-between">
-                <span className="text-fg-muted flex items-center gap-1"><TrendingUp className="w-3 h-3" /> Demand</span>
-                <span className={`badge ${demandColor[n.demand]}`}>{n.demand}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-fg-muted flex items-center gap-1"><Target className="w-3 h-3" /> Competition</span>
-                <span className={`badge ${demandColor[n.competition]}`}>{n.competition}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-fg-muted flex items-center gap-1"><DollarSign className="w-3 h-3" /> Profitability</span>
-                <span className={`badge ${demandColor[n.profitability]}`}>{n.profitability}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-fg-muted">Trend</span>
-                <span className="text-fg-soft">{n.trend}</span>
-              </div>
+              <div className="flex items-center justify-between"><span className="text-fg-muted flex items-center gap-1"><TrendingUp className="w-3 h-3" /> Demand</span><span className={`badge ${demandColor[n.demand]}`}>{n.demand}</span></div>
+              <div className="flex items-center justify-between"><span className="text-fg-muted flex items-center gap-1"><Target className="w-3 h-3" /> Competition</span><span className={`badge ${demandColor[n.competition]}`}>{n.competition}</span></div>
+              <div className="flex items-center justify-between"><span className="text-fg-muted flex items-center gap-1"><DollarSign className="w-3 h-3" /> Profitability</span><span className={`badge ${demandColor[n.profitability]}`}>{n.profitability}</span></div>
+              <div className="flex items-center justify-between"><span className="text-fg-muted">Trend</span><span className="text-fg-soft">{n.trend}</span></div>
             </div>
             <div className="mt-3 pt-3 border-t border-border-soft">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-fg-muted">Opportunity Score</span>
-                <div className="flex items-center gap-2">
-                  <div className="w-20 h-1.5 bg-bg-soft rounded-full overflow-hidden">
-                    <div className="h-full bg-brand-500 rounded-full" style={{ width: `${n.score}%` }} />
-                  </div>
-                  <span className="font-semibold text-fg">{n.score}/100</span>
-                </div>
+              <div className="flex items-center justify-between text-xs"><span className="text-fg-muted">Opportunity Score</span>
+                <div className="flex items-center gap-2"><div className="w-20 h-1.5 bg-bg-soft rounded-full overflow-hidden"><div className="h-full bg-brand-500 rounded-full" style={{ width: `${n.score}%` }} /></div><span className="font-semibold text-fg">{n.score}/100</span></div>
               </div>
             </div>
           </div>

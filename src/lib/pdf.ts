@@ -15,7 +15,7 @@ export interface PuzzleExportConfig {
   wordList?: string[]
 }
 
-const MARGIN = 0.5 // inches
+const MARGIN = 0.5
 const GUTTER = 0.3
 
 function pageDims(trimId: string, bleed: boolean) {
@@ -42,20 +42,16 @@ function addTitlePage(doc: jsPDF, title: string, author: string) {
 
 function addCopyrightPage(doc: jsPDF, title: string, author: string) {
   doc.addPage()
-  const pw = doc.internal.pageSize.getWidth()
   const ph = doc.internal.pageSize.getHeight()
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(9)
   const lines = [
-    `© ${new Date().getFullYear()} ${author || 'Unknown Author'}`,
-    'All rights reserved.',
-    '',
+    `\u00A9 ${new Date().getFullYear()} ${author || 'Unknown Author'}`,
+    'All rights reserved.', '',
     `Title: ${title || 'Untitled'}`,
     'No part of this book may be reproduced or transmitted',
-    'in any form or by any means without written permission.',
-    '',
-    'First Edition.',
-    '',
+    'in any form or by any means without written permission.', '',
+    'First Edition.', '',
     'Printed in the United States of America.',
   ]
   doc.text(lines, MARGIN, ph - 2)
@@ -76,7 +72,6 @@ function drawWordSearchPage(doc: jsPDF, puzzle: WordSearchPuzzle, pageNum: numbe
   doc.setFontSize(14)
   doc.text(`Word Search #${pageNum}`, startX, MARGIN + 0.4)
 
-  // grid
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(showSolution ? 10 : 12)
   for (let r = 0; r < size; r++) {
@@ -87,14 +82,12 @@ function drawWordSearchPage(doc: jsPDF, puzzle: WordSearchPuzzle, pageNum: numbe
     }
   }
 
-  // grid lines
   doc.setLineWidth(0.01)
   for (let i = 0; i <= size; i++) {
     doc.line(startX, startY + i * cell, startX + size * cell, startY + i * cell)
     doc.line(startX + i * cell, startY, startX + i * cell, startY + size * cell)
   }
 
-  // word list
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(11)
   const wordsPerRow = 3
@@ -105,7 +98,6 @@ function drawWordSearchPage(doc: jsPDF, puzzle: WordSearchPuzzle, pageNum: numbe
     doc.text(`${w.word}`, startX + col * (availW / wordsPerRow), wordStartY + row * 0.25)
   })
 
-  // page number
   doc.setFontSize(9)
   doc.text(String(pageNum + 2), pw - MARGIN, ph - 0.3, { align: 'right' })
 }
@@ -138,13 +130,11 @@ function drawSudokuPage(doc: jsPDF, puzzle: SudokuPuzzle, pageNum: number, showS
     }
   }
 
-  // grid lines
   doc.setLineWidth(0.01)
   for (let i = 0; i <= size; i++) {
     doc.line(startX, startY + i * cell, startX + size * cell, startY + i * cell)
     doc.line(startX + i * cell, startY, startX + i * cell, startY + size * cell)
   }
-  // thick box lines
   const box = Math.sqrt(size)
   if (Number.isInteger(box)) {
     doc.setLineWidth(0.03)
@@ -181,7 +171,6 @@ function drawMazePage(doc: jsPDF, maze: MazePuzzle, pageNum: number) {
       }
     }
   }
-  // start/end markers
   doc.setFillColor(34, 197, 94)
   doc.rect(startX + maze.start[1] * cell, startY + maze.start[0] * cell, cell, cell, 'F')
   doc.setFillColor(239, 68, 68)
@@ -214,13 +203,11 @@ export function generateInteriorPDF(config: PuzzleExportConfig): jsPDF {
       const maze = generateMaze(config.largePrint ? 11 : 15)
       drawMazePage(doc, maze, i + 1)
     } else {
-      // default to word search for unsupported types in PDF
       const puzzle = generateWordSearch(['PUZZLE', 'BOOK', 'WORD', 'SEARCH', 'FIND', 'HIDDEN'], 14)
       drawWordSearchPage(doc, puzzle, i + 1, false)
     }
   }
 
-  // solution pages
   doc.addPage()
   const pw = doc.internal.pageSize.getWidth()
   doc.setFont('helvetica', 'bold')
@@ -262,7 +249,7 @@ export interface CoverExportConfig {
 
 export function generateCoverPDF(config: CoverExportConfig): jsPDF {
   const trim = trimById(config.trimSize)
-  const spineWidth = Math.max(0.0625, config.pageCount * 0.002252) // approx
+  const spineWidth = Math.max(0.0625, config.pageCount * 0.002252)
   const bleed = PAPERBACK_BLEED
   const w = trim.w * 2 + spineWidth + bleed * 4
   const h = trim.h + bleed * 2
@@ -272,18 +259,14 @@ export function generateCoverPDF(config: CoverExportConfig): jsPDF {
   const spineX = backX + trim.w
   const frontX = spineX + spineWidth
 
-  // back cover
   doc.setFillColor(255, 255, 255)
   doc.rect(backX, 0, trim.w, h, 'F')
-  // spine
   const [r, g, b] = hexToRgb(config.primaryColor)
   doc.setFillColor(r, g, b)
   doc.rect(spineX, 0, spineWidth, h, 'F')
-  // front cover
   doc.setFillColor(r, g, b)
   doc.rect(frontX, 0, trim.w, h, 'F')
 
-  // spine text
   doc.setTextColor(255, 255, 255)
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(10)
@@ -292,7 +275,6 @@ export function generateCoverPDF(config: CoverExportConfig): jsPDF {
   doc.setFontSize(7)
   doc.text(config.author || '', spineMid, h / 2 + 3, { align: 'center', angle: 90 })
 
-  // front cover title
   doc.setTextColor(255, 255, 255)
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(config.theme === 'bold' ? 28 : 22)
@@ -306,7 +288,6 @@ export function generateCoverPDF(config: CoverExportConfig): jsPDF {
   doc.setFontSize(11)
   doc.text(config.author || '', fcMid, h - 1, { align: 'center' })
 
-  // back cover placeholder text
   doc.setTextColor(100, 116, 139)
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(9)

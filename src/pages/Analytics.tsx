@@ -1,12 +1,10 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
-import { useAuth } from '../lib/auth'
 import { PageHeader, StatCard, Spinner } from '../components/ui'
 import { WORKFLOW_STAGES } from '../lib/constants'
-import { FolderKanban, BookCheck, Rocket, File as FileEdit, TrendingUp, Clock } from 'lucide-react'
+import { FolderKanban, BookCheck, Rocket, FileEdit, TrendingUp, Clock } from 'lucide-react'
 
 export default function Analytics() {
-  const { user } = useAuth()
   const [projects, setProjects] = useState<any[]>([])
   const [activity, setActivity] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -31,11 +29,7 @@ export default function Analytics() {
   const puzzleBooks = projects.filter((p) => p.book_type === 'puzzle')
   const coloringBooks = projects.filter((p) => p.book_type === 'coloring')
 
-  // stage distribution
-  const stageCounts = WORKFLOW_STAGES.map((s) => ({
-    label: s.label,
-    count: projects.filter((p) => p.current_stage === s.id).length,
-  }))
+  const stageCounts = WORKFLOW_STAGES.map((s) => ({ label: s.label, count: projects.filter((p) => p.current_stage === s.id).length }))
   const maxStageCount = Math.max(1, ...stageCounts.map((s) => s.count))
 
   return (
@@ -57,16 +51,13 @@ export default function Analytics() {
             <TypeBar label="Coloring Books" count={coloringBooks.length} total={projects.length} color="bg-accent-500" />
           </div>
         </div>
-
         <div className="card p-5">
           <h3 className="font-semibold text-fg mb-4 flex items-center gap-2"><Clock className="w-4 h-4 text-brand-600" /> Projects by Workflow Stage</h3>
           <div className="space-y-2">
             {stageCounts.map((s) => (
               <div key={s.label} className="flex items-center gap-2 text-xs">
                 <div className="w-28 text-fg-muted truncate">{s.label}</div>
-                <div className="flex-1 h-4 bg-bg-soft rounded-full overflow-hidden">
-                  <div className="h-full bg-brand-400 rounded-full" style={{ width: `${(s.count / maxStageCount) * 100}%` }} />
-                </div>
+                <div className="flex-1 h-4 bg-bg-soft rounded-full overflow-hidden"><div className="h-full bg-brand-400 rounded-full" style={{ width: `${(s.count / maxStageCount) * 100}%` }} /></div>
                 <div className="w-6 text-right text-fg-soft">{s.count}</div>
               </div>
             ))}
@@ -76,16 +67,11 @@ export default function Analytics() {
 
       <div className="card p-5">
         <h3 className="font-semibold text-fg mb-4">Recent Activity</h3>
-        {activity.length === 0 ? (
-          <p className="text-sm text-fg-muted">No activity recorded yet.</p>
-        ) : (
+        {activity.length === 0 ? (<p className="text-sm text-fg-muted">No activity recorded yet.</p>) : (
           <div className="space-y-2">
             {activity.map((a) => (
               <div key={a.id} className="flex items-center justify-between text-sm py-2 border-b border-border-soft last:border-0">
-                <div>
-                  <span className="text-fg">{a.action}</span>
-                  {a.detail && <span className="text-fg-muted"> — {a.detail}</span>}
-                </div>
+                <div><span className="text-fg">{a.action}</span>{a.detail && <span className="text-fg-muted"> \u2014 {a.detail}</span>}</div>
                 <span className="text-xs text-fg-muted">{new Date(a.created_at).toLocaleDateString()}</span>
               </div>
             ))}
@@ -100,13 +86,8 @@ function TypeBar({ label, count, total, color }: { label: string; count: number;
   const pct = total > 0 ? Math.round((count / total) * 100) : 0
   return (
     <div>
-      <div className="flex items-center justify-between text-sm mb-1">
-        <span className="text-fg-soft">{label}</span>
-        <span className="text-fg-muted">{count} ({pct}%)</span>
-      </div>
-      <div className="h-2.5 bg-bg-soft rounded-full overflow-hidden">
-        <div className={`h-full ${color} rounded-full transition-all`} style={{ width: `${pct}%` }} />
-      </div>
+      <div className="flex items-center justify-between text-sm mb-1"><span className="text-fg-soft">{label}</span><span className="text-fg-muted">{count} ({pct}%)</span></div>
+      <div className="h-2.5 bg-bg-soft rounded-full overflow-hidden"><div className={`h-full ${color} rounded-full transition-all`} style={{ width: `${pct}%` }} /></div>
     </div>
   )
 }

@@ -20,9 +20,7 @@ export function StatCard({ label, value, icon, accent }: { label: string; value:
           <div className="text-sm text-fg-muted">{label}</div>
           <div className="text-2xl font-bold text-fg mt-1">{value}</div>
         </div>
-        <div className={`w-11 h-11 rounded-lg flex items-center justify-center ${accent ?? 'bg-brand-50 text-brand-600'}`}>
-          {icon}
-        </div>
+        <div className={`w-11 h-11 rounded-lg flex items-center justify-center ${accent ?? 'bg-brand-50 text-brand-600'}`}>{icon}</div>
       </div>
     </div>
   )

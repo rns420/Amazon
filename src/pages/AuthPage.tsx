@@ -20,11 +20,7 @@ export default function AuthPage() {
     setError(null)
     setBusy(true)
     if (mode === 'signup') {
-      if (password.length < 6) {
-        setError('Password must be at least 6 characters.')
-        setBusy(false)
-        return
-      }
+      if (password.length < 6) { setError('Password must be at least 6 characters.'); setBusy(false); return }
       const { error } = await signUp(email, password, name)
       if (error) { setError(error); setBusy(false); return }
       notify('Account created! Welcome to KDP Studio.', 'success')
@@ -50,18 +46,8 @@ export default function AuthPage() {
 
         <div className="card p-6">
           <div className="flex gap-1 p-1 bg-bg-soft rounded-lg mb-6">
-            <button
-              onClick={() => setMode('signin')}
-              className={`flex-1 py-2 rounded-md text-sm font-medium transition ${mode === 'signin' ? 'bg-bg text-fg shadow-card' : 'text-fg-muted'}`}
-            >
-              Sign In
-            </button>
-            <button
-              onClick={() => setMode('signup')}
-              className={`flex-1 py-2 rounded-md text-sm font-medium transition ${mode === 'signup' ? 'bg-bg text-fg shadow-card' : 'text-fg-muted'}`}
-            >
-              Sign Up
-            </button>
+            <button onClick={() => setMode('signin')} className={`flex-1 py-2 rounded-md text-sm font-medium transition ${mode === 'signin' ? 'bg-bg text-fg shadow-card' : 'text-fg-muted'}`}>Sign In</button>
+            <button onClick={() => setMode('signup')} className={`flex-1 py-2 rounded-md text-sm font-medium transition ${mode === 'signup' ? 'bg-bg text-fg shadow-card' : 'text-fg-muted'}`}>Sign Up</button>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -85,16 +71,14 @@ export default function AuthPage() {
               <label className="label">Password</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fg-muted" />
-                <input type="password" className="input pl-9" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required />
+                <input type="password" className="input pl-9" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022" required />
               </div>
             </div>
 
-            {error && (
-              <div className="text-sm text-danger-600 bg-danger-50 rounded-lg px-3 py-2">{error}</div>
-            )}
+            {error && <div className="text-sm text-danger-600 bg-danger-50 rounded-lg px-3 py-2">{error}</div>}
 
             <button type="submit" disabled={busy} className="btn-primary w-full">
-              {busy ? 'Please wait…' : mode === 'signin' ? 'Sign In' : 'Create Account'}
+              {busy ? 'Please wait\u2026' : mode === 'signin' ? 'Sign In' : 'Create Account'}
             </button>
           </form>
         </div>

@@ -34,8 +34,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUp = async (email: string, password: string, name: string) => {
     const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
+      email, password,
       options: { data: { display_name: name } },
     })
     if (error) return { error: error.message }
@@ -50,9 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: error?.message ?? null }
   }
 
-  const signOut = async () => {
-    await supabase.auth.signOut()
-  }
+  const signOut = async () => { await supabase.auth.signOut() }
 
   return (
     <Ctx.Provider value={{ user, session, loading, signIn, signUp, signOut }}>

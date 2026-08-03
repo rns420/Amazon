@@ -1,8 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './lib/auth'
-import { useToast } from './lib/toast'
-import { useEffect } from 'react'
-import AuthPage from './pages/AuthPage'
 import AppShell from './components/AppShell'
 import Dashboard from './pages/Dashboard'
 import Projects from './pages/Projects'
@@ -20,6 +17,7 @@ import Analytics from './pages/Analytics'
 import Settings from './pages/Settings'
 import AdminPanel from './pages/AdminPanel'
 import Profile from './pages/Profile'
+import AuthPage from './pages/AuthPage'
 
 function ProtectedRoutes() {
   return (

@@ -12,7 +12,6 @@ export function validateCompliance(config: PuzzleExportConfig): ValidationIssue[
   const issues: ValidationIssue[] = []
   const trim = trimById(config.trimSize)
 
-  // page count: KDP paperback minimum 24
   if (config.pageCount < 24) {
     issues.push({ level: 'error', field: 'Page Count', message: `Page count ${config.pageCount} is below KDP minimum of 24.`, fix: 'Add more puzzles or pages to reach at least 24 pages.' })
   } else if (config.pageCount < 50) {
@@ -21,24 +20,20 @@ export function validateCompliance(config: PuzzleExportConfig): ValidationIssue[
     issues.push({ level: 'pass', field: 'Page Count', message: `Page count ${config.pageCount} meets KDP requirements.` })
   }
 
-  // trim size
   if (!trim) {
     issues.push({ level: 'error', field: 'Trim Size', message: 'Invalid trim size selected.' })
   } else {
     issues.push({ level: 'pass', field: 'Trim Size', message: `Trim size ${trim.label} is a valid KDP paperback size.` })
   }
 
-  // bleed
   if (trim?.bleed && !config.largePrint) {
     issues.push({ level: 'warning', field: 'Bleed', message: `This trim size supports bleed. Ensure bleed is configured if your design has full-bleed images.`, fix: 'Set bleed to 0.125" on outer edges or disable bleed in design.' })
   } else {
     issues.push({ level: 'pass', field: 'Bleed', message: 'Bleed configuration is appropriate.' })
   }
 
-  // margins
-  issues.push({ level: 'pass', field: 'Margins', message: `Interior margins set to 0.5" outer, 0.3" gutter — within KDP guidelines.` })
+  issues.push({ level: 'pass', field: 'Margins', message: `Interior margins set to 0.5" outer, 0.3" gutter \u2014 within KDP guidelines.` })
 
-  // title
   if (!config.title || config.title.trim().length < 3) {
     issues.push({ level: 'error', field: 'Title', message: 'Title is missing or too short.', fix: 'Provide a descriptive title of at least 3 characters.' })
   } else if (config.title.length > 200) {
@@ -47,21 +42,18 @@ export function validateCompliance(config: PuzzleExportConfig): ValidationIssue[
     issues.push({ level: 'pass', field: 'Title', message: 'Title length is valid.' })
   }
 
-  // author
   if (!config.author || config.author.trim().length < 2) {
     issues.push({ level: 'warning', field: 'Author', message: 'Author name is missing.', fix: 'Set an author name before publishing.' })
   } else {
     issues.push({ level: 'pass', field: 'Author', message: 'Author name is set.' })
   }
 
-  // copyright risk: generic placeholder check
   if (config.title && /sample|placeholder|lorem/i.test(config.title)) {
     issues.push({ level: 'error', field: 'Copyright Risk', message: 'Title appears to contain placeholder text.', fix: 'Replace placeholder text with a real title.' })
   } else {
     issues.push({ level: 'pass', field: 'Copyright Risk', message: 'No obvious copyright/trademark issues detected in title.' })
   }
 
-  // puzzle solvability
   issues.push({ level: 'pass', field: 'Puzzle Solvability', message: 'All generated puzzles include verified solutions.' })
 
   return issues
@@ -106,35 +98,20 @@ export interface QualityCheck {
 export function runQualityChecks(config: PuzzleExportConfig): { checks: QualityCheck[]; score: number } {
   const checks: QualityCheck[] = []
 
-  // duplicate puzzles — randomization makes duplicates extremely unlikely
   checks.push({ field: 'Duplicate Puzzles', status: 'pass', message: 'Each puzzle is randomly generated; duplicates are statistically improbable.' })
-
-  // puzzle solvability
   checks.push({ field: 'Puzzle Solvability', status: 'pass', message: 'All puzzles have verified solutions included.' })
-
-  // solution pages
   checks.push({ field: 'Solution Pages', status: 'pass', message: 'Solution section included at end of book.' })
-
-  // page numbering
   checks.push({ field: 'Page Numbering', status: 'pass', message: 'Sequential page numbers applied to all content pages.' })
-
-  // layout
   checks.push({ field: 'Layout Integrity', status: 'pass', message: 'No broken layouts detected; all elements within margins.' })
-
-  // margins
   checks.push({ field: 'Margins', status: 'pass', message: 'Interior margins meet KDP minimums.' })
-
-  // image/print quality
   checks.push({ field: 'Print Quality', status: 'pass', message: 'Vector-based content renders at full print resolution.' })
 
-  // grammar/spelling (title)
   if (config.title && config.title.trim().length > 0) {
     checks.push({ field: 'Title Spelling', status: 'pass', message: 'No obvious spelling issues in title.' })
   } else {
     checks.push({ field: 'Title Spelling', status: 'warning', message: 'Title is empty.' })
   }
 
-  // cropped images
   checks.push({ field: 'Cropped Images', status: 'pass', message: 'No cropped content detected.' })
 
   const passCount = checks.filter((c) => c.status === 'pass').length

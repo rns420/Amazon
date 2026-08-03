@@ -121,9 +121,7 @@ export interface MazePuzzle {
 }
 
 export function generateMaze(size = 15): MazePuzzle {
-  // simple grid maze: 1 = wall, 0 = path
   const grid: number[][] = Array.from({ length: size }, () => Array(size).fill(1))
-  // recursive backtracker on odd cells
   const stack: [number, number][] = []
   const start: [number, number] = [1, 1]
   grid[1][1] = 0

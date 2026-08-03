@@ -28,97 +28,40 @@ export default function PuzzleGenerator() {
   }, [puzzleType, difficulty, largePrint, gridSize, seed])
 
   const handleExport = () => {
-    downloadInteriorPDF({
-      puzzleType,
-      difficulty,
-      pageCount,
-      trimSize,
-      largePrint,
-      theme: 'general',
-      title: 'Sample Puzzle Book',
-      author: 'Author Name',
-      gridSize,
-      wordList,
-    })
+    downloadInteriorPDF({ puzzleType, difficulty, pageCount, trimSize, largePrint, theme: 'general', title: 'Sample Puzzle Book', author: 'Author Name', gridSize, wordList })
     notify('Interior PDF exported.', 'success')
   }
 
   return (
     <div className="p-6 lg:p-8 max-w-7xl mx-auto animate-fade-in">
-      <PageHeader
-        title="Puzzle Generator"
-        subtitle="Create puzzle book interiors with live preview and PDF export"
-        actions={<button onClick={handleExport} className="btn-primary"><Download className="w-4 h-4" /> Export PDF</button>}
-      />
+      <PageHeader title="Puzzle Generator" subtitle="Create puzzle book interiors with live preview and PDF export"
+        actions={<button onClick={handleExport} className="btn-primary"><Download className="w-4 h-4" /> Export PDF</button>} />
 
       <div className="grid lg:grid-cols-3 gap-6">
-        {/* Config */}
         <div className="lg:col-span-1 space-y-4">
           <div className="card p-5 space-y-4">
-            <div>
-              <label className="label">Puzzle Type</label>
-              <select className="input" value={puzzleType} onChange={(e) => setPuzzleType(e.target.value)}>
-                {PUZZLE_TYPES.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="label">Difficulty</label>
-              <select className="input" value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
-                {DIFFICULTY_LEVELS.map((d) => <option key={d.id} value={d.id}>{d.label}</option>)}
-              </select>
-            </div>
-            {puzzleType === 'sudoku' && (
-              <div>
-                <label className="label">Grid Size</label>
-                <select className="input" value={gridSize} onChange={(e) => setGridSize(Number(e.target.value))}>
-                  <option value={4}>4×4 (Kids)</option>
-                  <option value={9}>9×9 (Standard)</option>
-                </select>
-              </div>
-            )}
-            <div>
-              <label className="label">Page Count</label>
-              <input type="number" min={24} max={500} className="input" value={pageCount} onChange={(e) => setPageCount(Number(e.target.value))} />
-            </div>
-            <div>
-              <label className="label">Trim Size</label>
-              <select className="input" value={trimSize} onChange={(e) => setTrimSize(e.target.value)}>
-                {KDP_TRIM_SIZES.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}
-              </select>
-            </div>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={largePrint} onChange={(e) => setLargePrint(e.target.checked)} className="rounded" />
-              <span className="text-sm text-fg-soft">Large Print</span>
-            </label>
-            {puzzleType === 'wordsearch' && (
-              <div>
-                <label className="label">Word List (one per line)</label>
-                <textarea className="input min-h-[120px] font-mono text-xs" value={wordListText} onChange={(e) => setWordListText(e.target.value)} />
-              </div>
-            )}
+            <div><label className="label">Puzzle Type</label><select className="input" value={puzzleType} onChange={(e) => setPuzzleType(e.target.value)}>{PUZZLE_TYPES.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}</select></div>
+            <div><label className="label">Difficulty</label><select className="input" value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>{DIFFICULTY_LEVELS.map((d) => <option key={d.id} value={d.id}>{d.label}</option>)}</select></div>
+            {puzzleType === 'sudoku' && (<div><label className="label">Grid Size</label><select className="input" value={gridSize} onChange={(e) => setGridSize(Number(e.target.value))}><option value={4}>4\u00d74 (Kids)</option><option value={9}>9\u00d79 (Standard)</option></select></div>)}
+            <div><label className="label">Page Count</label><input type="number" min={24} max={500} className="input" value={pageCount} onChange={(e) => setPageCount(Number(e.target.value))} /></div>
+            <div><label className="label">Trim Size</label><select className="input" value={trimSize} onChange={(e) => setTrimSize(e.target.value)}>{KDP_TRIM_SIZES.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}</select></div>
+            <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={largePrint} onChange={(e) => setLargePrint(e.target.checked)} className="rounded" /><span className="text-sm text-fg-soft">Large Print</span></label>
+            {puzzleType === 'wordsearch' && (<div><label className="label">Word List (one per line)</label><textarea className="input min-h-[120px] font-mono text-xs" value={wordListText} onChange={(e) => setWordListText(e.target.value)} /></div>)}
           </div>
-
           <div className="card p-4 flex items-center gap-2">
             <button onClick={() => setSeed((s) => s + 1)} className="btn-outline flex-1"><RefreshCw className="w-4 h-4" /> Regenerate</button>
             <span className="text-xs text-fg-muted flex items-center gap-1"><Eye className="w-3.5 h-3.5" /> Live preview</span>
           </div>
         </div>
 
-        {/* Preview */}
         <div className="lg:col-span-2">
           <div className="card p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <Grid3x3 className="w-5 h-5 text-brand-600" />
-              <h3 className="font-semibold text-fg">Preview</h3>
-            </div>
-            {puzzleType === 'wordsearch' && <WordSearchPreview puzzle={preview as ReturnType<typeof generateWordSearch>} />}
-            {puzzleType === 'sudoku' && <SudokuPreview puzzle={preview as ReturnType<typeof generateSudoku>} />}
-            {puzzleType === 'mazes' && <MazePreview maze={preview as ReturnType<typeof generateMaze>} />}
+            <div className="flex items-center gap-2 mb-4"><Grid3x3 className="w-5 h-5 text-brand-600" /><h3 className="font-semibold text-fg">Preview</h3></div>
+            {puzzleType === 'wordsearch' && <WordSearchPreview puzzle={preview} />}
+            {puzzleType === 'sudoku' && <SudokuPreview puzzle={preview} />}
+            {puzzleType === 'mazes' && <MazePreview maze={preview} />}
             {!['wordsearch', 'sudoku', 'mazes'].includes(puzzleType) && (
-              <div className="text-center py-10 text-fg-muted text-sm">
-                Live preview for "{PUZZLE_TYPES.find((t) => t.id === puzzleType)?.label}" is shown in the exported PDF.
-                The generator supports this puzzle type in the full interior export.
-              </div>
+              <div className="text-center py-10 text-fg-muted text-sm">Live preview for "{PUZZLE_TYPES.find((t) => t.id === puzzleType)?.label}" is shown in the exported PDF. The generator supports this puzzle type in the full interior export.</div>
             )}
           </div>
         </div>
@@ -137,11 +80,7 @@ function WordSearchPreview({ puzzle }: { puzzle: ReturnType<typeof generateWordS
               <tr key={r}>
                 {row.map((ch, c) => {
                   const isWord = puzzle.words.some((w) => w.placed && w.cells.some(([wr, wc]) => wr === r && wc === c))
-                  return (
-                    <td key={c} className={`w-7 h-7 text-center font-mono text-sm border border-border-soft ${isWord ? 'bg-brand-50 text-brand-700 font-bold' : 'text-fg-soft'}`}>
-                      {ch}
-                    </td>
-                  )
+                  return <td key={c} className={`w-7 h-7 text-center font-mono text-sm border border-border-soft ${isWord ? 'bg-brand-50 text-brand-700 font-bold' : 'text-fg-soft'}`}>{ch}</td>
                 })}
               </tr>
             ))}
@@ -151,11 +90,7 @@ function WordSearchPreview({ puzzle }: { puzzle: ReturnType<typeof generateWordS
       <div className="mt-4">
         <div className="text-xs font-medium text-fg-muted mb-1.5">Words to find:</div>
         <div className="flex flex-wrap gap-2">
-          {puzzle.words.map((w, i) => (
-            <span key={i} className={`badge ${w.placed ? 'bg-bg-soft text-fg-soft' : 'bg-danger-50 text-danger-600'}`}>
-              {w.word} {w.placed ? '' : '(not placed)'}
-            </span>
-          ))}
+          {puzzle.words.map((w, i) => (<span key={i} className={`badge ${w.placed ? 'bg-bg-soft text-fg-soft' : 'bg-danger-50 text-danger-600'}`}>{w.word} {w.placed ? '' : '(not placed)'}</span>))}
         </div>
       </div>
     </div>
@@ -174,11 +109,7 @@ function SudokuPreview({ puzzle }: { puzzle: ReturnType<typeof generateSudoku> }
               {row.map((n, c) => {
                 const borderRight = Number.isInteger(box) && (c + 1) % box === 0 && c < size - 1
                 const borderBottom = Number.isInteger(box) && (r + 1) % box === 0 && r < size - 1
-                return (
-                  <td key={c} className={`w-9 h-9 text-center font-mono text-base border border-border-soft ${n === 0 ? 'text-transparent' : 'text-fg font-medium'} ${borderRight ? 'border-r-2 border-r-brand-300' : ''} ${borderBottom ? 'border-b-2 border-b-brand-300' : ''}`}>
-                    {n === 0 ? '' : n}
-                  </td>
-                )
+                return <td key={c} className={`w-9 h-9 text-center font-mono text-base border border-border-soft ${n === 0 ? 'text-transparent' : 'text-fg font-medium'} ${borderRight ? 'border-r-2 border-r-brand-300' : ''} ${borderBottom ? 'border-b-2 border-b-brand-300' : ''}`}>{n === 0 ? '' : n}</td>
               })}
             </tr>
           ))}
@@ -198,9 +129,7 @@ function MazePreview({ maze }: { maze: ReturnType<typeof generateMaze> }) {
               {row.map((cell, c) => {
                 const isStart = r === maze.start[0] && c === maze.start[1]
                 const isEnd = r === maze.end[0] && c === maze.end[1]
-                return (
-                  <td key={c} className={`w-4 h-4 border-collapse ${cell === 1 ? 'bg-slate-700' : isStart ? 'bg-success-500' : isEnd ? 'bg-danger-500' : 'bg-white'}`} />
-                )
+                return <td key={c} className={`w-4 h-4 border-collapse ${cell === 1 ? 'bg-slate-700' : isStart ? 'bg-success-500' : isEnd ? 'bg-danger-500' : 'bg-white'}`} />
               })}
             </tr>
           ))}
