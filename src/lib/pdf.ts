@@ -54,7 +54,6 @@ function addTitlePage(doc: jsPDF, title: string, author: string) {
 function addCopyrightPage(doc: jsPDF, title: string, author: string) {
   doc.addPage()
   const ph = doc.internal.pageSize.getHeight()
-  const pw = doc.internal.pageSize.getWidth()
   const margin = 0.875
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(9)
@@ -79,7 +78,9 @@ function addCopyrightPage(doc: jsPDF, title: string, author: string) {
     '',
     `ISBN: XXX-X-XXXXXX-XX-X`,
   ]
-  doc.text(lines, margin, ph - 4)
+  lines.forEach((line, i) => {
+    doc.text(line, margin, ph - 4 - (lines.length - 1 - i) * 0.2)
+  })
 }
 
 function drawWordSearchPage(doc: jsPDF, puzzle: WordSearchPuzzle, pageNum: number, showSolution: boolean, largePrint: boolean) {

@@ -73,7 +73,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
                       }`
                     }
                   >
-                    <item.icon className="w-4.5 h-4.5 shrink-0" />
+                    <item.icon className="w-5 h-5 shrink-0" />
                     {item.label}
                   </NavLink>
                 ))}

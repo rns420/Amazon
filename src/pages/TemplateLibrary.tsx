@@ -65,9 +65,10 @@ function CreateTemplateModal({ onClose, onCreated }: { onClose: () => void; onCr
   const [configText, setConfigText] = useState('{}')
 
   const create = async () => {
+    if (!user) { notify('You must be signed in to create a template.', 'error'); return }
     let config: Record<string, any>
     try { config = JSON.parse(configText) } catch { notify('Config must be valid JSON.', 'error'); return }
-    const { error } = await supabase.from('templates').insert({ name, category, config, is_builtin: false, user_id: user!.id })
+    const { error } = await supabase.from('templates').insert({ name, category, config, is_builtin: false, user_id: user.id })
     if (error) { notify(error.message, 'error'); return }
     notify('Template created.', 'success')
     onCreated()

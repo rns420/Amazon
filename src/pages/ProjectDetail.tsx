@@ -189,7 +189,22 @@ export default function ProjectDetail() {
   )
 }
 
-function StageContent({ stageId, project, exportConfig, coverConfig, complianceIssues, quality, generatingMeta, onRunCompliance, onRunQuality, onGenerateMeta, onDownloadInterior, onDownloadCover }: any) {
+interface StageContentProps {
+  stageId: string
+  project: Project
+  exportConfig: Record<string, unknown>
+  coverConfig: Record<string, unknown>
+  complianceIssues: { level: string; field: string; message: string; fix?: string }[]
+  quality: { checks: { field: string; status: string; message: string }[]; score: number }
+  generatingMeta: boolean
+  onRunCompliance: () => void
+  onRunQuality: () => void
+  onGenerateMeta: () => void
+  onDownloadInterior: () => void
+  onDownloadCover: () => void
+}
+
+function StageContent({ stageId, project, complianceIssues, quality, generatingMeta, onRunCompliance, onRunQuality, onGenerateMeta, onDownloadInterior, onDownloadCover }: StageContentProps) {
   switch (stageId) {
     case 'market-research':
       return <div className="space-y-3"><p className="text-sm text-fg-soft">Research the Amazon marketplace for opportunities. Visit the Market Research tool for detailed analysis.</p><Link to="/market-research" className="btn-primary inline-flex">Open Market Research</Link>

@@ -60,6 +60,7 @@ export default function NicheFinder() {
   }
 
   const demandColor: Record<string, string> = { High: 'bg-success-50 text-success-600', Medium: 'bg-warning-50 text-warning-600', Low: 'bg-danger-50 text-danger-600' }
+  const competitionColor: Record<string, string> = { High: 'bg-danger-50 text-danger-600', Medium: 'bg-warning-50 text-warning-600', Low: 'bg-success-50 text-success-600' }
 
   return (
     <div className="p-6 lg:p-8 max-w-7xl mx-auto animate-fade-in">
@@ -91,7 +92,7 @@ export default function NicheFinder() {
               <p className="text-xs text-fg-soft mb-3 leading-relaxed">{n.reasoning}</p>
               <div className="space-y-1.5 text-xs">
                 <div className="flex items-center justify-between"><span className="text-fg-muted flex items-center gap-1"><TrendingUp className="w-3 h-3" /> Demand</span><span className={`badge ${demandColor[n.demand] ?? ''}`}>{n.demand}</span></div>
-                <div className="flex items-center justify-between"><span className="text-fg-muted flex items-center gap-1"><Target className="w-3 h-3" /> Competition</span><span className={`badge ${demandColor[n.competition] ?? ''}`}>{n.competition}</span></div>
+                <div className="flex items-center justify-between"><span className="text-fg-muted flex items-center gap-1"><Target className="w-3 h-3" /> Competition</span><span className={`badge ${competitionColor[n.competition] ?? ''}`}>{n.competition}</span></div>
                 <div className="flex items-center justify-between"><span className="text-fg-muted flex items-center gap-1"><DollarSign className="w-3 h-3" /> Profitability</span><span className={`badge ${demandColor[n.profitability] ?? ''}`}>{n.profitability}</span></div>
                 <div className="flex items-center justify-between"><span className="text-fg-muted">Trend</span><span className="text-fg-soft">{n.trend}</span></div>
               </div>

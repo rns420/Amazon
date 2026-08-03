@@ -18,6 +18,7 @@ import Settings from './pages/Settings'
 import AdminPanel from './pages/AdminPanel'
 import Profile from './pages/Profile'
 import AuthPage from './pages/AuthPage'
+import NotFound from './pages/NotFound'
 
 function ProtectedRoutes() {
   return (
@@ -39,9 +40,18 @@ function ProtectedRoutes() {
         <Route path="/settings" element={<Settings />} />
         <Route path="/admin" element={<AdminPanel />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </AppShell>
+  )
+}
+
+function PublicRoutes() {
+  return (
+    <Routes>
+      <Route path="/auth" element={<AuthPage />} />
+      <Route path="*" element={<Navigate to="/auth" replace />} />
+    </Routes>
   )
 }
 
@@ -56,10 +66,5 @@ export default function App() {
     )
   }
 
-  return (
-    <Routes>
-      <Route path="/auth" element={user ? <Navigate to="/" /> : <AuthPage />} />
-      <Route path="/*" element={user ? <ProtectedRoutes /> : <Navigate to="/auth" />} />
-    </Routes>
-  )
+  return user ? <ProtectedRoutes /> : <PublicRoutes />
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useToast } from '../lib/toast'
 import { useAuth } from '../lib/auth'
 import { supabase } from '../lib/supabase'
@@ -29,7 +29,7 @@ export default function ColoringGenerator() {
       setAuthor(data?.display_name ?? '')
     })()
   }, [user])
-  const patterns = generateColoringPattern(theme, seed)
+  const patterns = useMemo(() => generateColoringPattern(theme, seed), [theme, seed])
 
   const handleExport = () => {
     if (!title.trim()) { notify('Please enter a book title before exporting.', 'error'); return }

@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { useToast } from '../lib/toast'
 import { useAuth } from '../lib/auth'
 import { supabase } from '../lib/supabase'
-import { generateWordSearch, generateSudoku, generateMaze } from '../lib/puzzles'
+import { generateWordSearch, generateSudoku, generateMaze, WordSearchPuzzle, SudokuPuzzle, MazePuzzle } from '../lib/puzzles'
 import { downloadInteriorPDF } from '../lib/pdf'
 import { PUZZLE_TYPES, DIFFICULTY_LEVELS, KDP_TRIM_SIZES } from '../lib/constants'
 import { PageHeader } from '../components/ui'
@@ -32,13 +32,20 @@ export default function PuzzleGenerator() {
 
   const wordList = useMemo(() => wordListText.split('\n').map((w) => w.trim()).filter(Boolean), [wordListText])
 
-  const preview = useMemo<any>(() => {
-    if (puzzleType === 'wordsearch') return generateWordSearch(wordList.length > 2 ? wordList : ['PUZZLE', 'BOOK', 'WORD', 'SEARCH'], largePrint ? 12 : 14)
-    if (puzzleType === 'sudoku') return generateSudoku(gridSize === 4 ? 4 : 9, difficulty)
-    if (puzzleType === 'mazes') return generateMaze(largePrint ? 11 : 15)
-    return generateWordSearch(['PUZZLE', 'BOOK', 'WORD', 'SEARCH'], 14)
+  const wordSearchPreview = useMemo<WordSearchPuzzle>(() => {
+    return generateWordSearch(wordList.length > 2 ? wordList : ['PUZZLE', 'BOOK', 'WORD', 'SEARCH'], largePrint ? 12 : 14)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [puzzleType, difficulty, largePrint, gridSize, seed])
+  }, [wordList, largePrint, seed])
+
+  const sudokuPreview = useMemo<SudokuPuzzle>(() => {
+    return generateSudoku(gridSize === 4 ? 4 : 9, difficulty)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gridSize, difficulty, seed])
+
+  const mazePreview = useMemo<MazePuzzle>(() => {
+    return generateMaze(largePrint ? 11 : 15)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [largePrint, seed])
 
   const handleExport = () => {
     if (!title.trim()) { notify('Please enter a book title before exporting.', 'error'); return }
@@ -73,9 +80,9 @@ export default function PuzzleGenerator() {
         <div className="lg:col-span-2">
           <div className="card p-6">
             <div className="flex items-center gap-2 mb-4"><Grid3x3 className="w-5 h-5 text-brand-600" /><h3 className="font-semibold text-fg">Preview</h3></div>
-            {puzzleType === 'wordsearch' && <WordSearchPreview puzzle={preview} />}
-            {puzzleType === 'sudoku' && <SudokuPreview puzzle={preview} />}
-            {puzzleType === 'mazes' && <MazePreview maze={preview} />}
+            {puzzleType === 'wordsearch' && <WordSearchPreview puzzle={wordSearchPreview} />}
+            {puzzleType === 'sudoku' && <SudokuPreview puzzle={sudokuPreview} />}
+            {puzzleType === 'mazes' && <MazePreview maze={mazePreview} />}
             {!['wordsearch', 'sudoku', 'mazes'].includes(puzzleType) && (
               <div className="text-center py-10 text-fg-muted text-sm">Live preview for "{PUZZLE_TYPES.find((t) => t.id === puzzleType)?.label}" is shown in the exported PDF. The generator supports this puzzle type in the full interior export.</div>
             )}

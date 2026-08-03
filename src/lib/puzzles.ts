@@ -31,7 +31,9 @@ export function generateWordSearch(words: string[], size = 14): WordSearchPuzzle
         cells.push([nr, nc])
       }
       if (ok) {
-        for (let i = 0; i < word.length; i++) grid[cells[i][0]][cells[i][1]] = word[i]
+        for (let i = 0; i < word.length; i++) {
+          grid[cells[i][0]][cells[i][1]] = word[i]
+        }
         placed.push({ word, placed: true, cells })
         success = true
       }
@@ -79,10 +81,11 @@ function isValid(board: number[][], row: number, col: number, num: number, size:
 }
 
 function solveSudoku(board: number[][], size: number): boolean {
+  const numbers = Array.from({ length: size }, (_, i) => i + 1)
   for (let r = 0; r < size; r++) {
     for (let c = 0; c < size; c++) {
       if (board[r][c] === 0) {
-        for (const num of shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9].slice(0, size))) {
+        for (const num of shuffle(numbers)) {
           if (isValid(board, r, c, num, size)) {
             board[r][c] = num
             if (solveSudoku(board, size)) return true
@@ -137,7 +140,7 @@ export function generateMaze(size = 15): MazePuzzle {
     }
     if (neighbors.length) {
       const [nr, nc] = neighbors[Math.floor(Math.random() * neighbors.length)]
-      grid[(r + nr) / 2][(c + nc) / 2] = 0
+      grid[Math.floor((r + nr) / 2)][Math.floor((c + nc) / 2)] = 0
       grid[nr][nc] = 0
       stack.push([nr, nc])
     } else {
