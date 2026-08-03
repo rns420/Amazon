@@ -20,6 +20,7 @@ export default function ProjectDetail() {
   const [saving, setSaving] = useState(false)
   const [versions, setVersions] = useState<{ id: string; label: string | null; created_at: string }[]>([])
   const [showVersions, setShowVersions] = useState(false)
+  const [generatingMeta, setGeneratingMeta] = useState(false)
 
   const load = useCallback(async () => {
     if (!id) return
@@ -100,8 +101,6 @@ export default function ProjectDetail() {
     await saveProject({ quality_score: quality.score }, 'Ran quality checks')
     notify(`Quality score: ${quality.score}/100`, 'success')
   }
-
-  const [generatingMeta, setGeneratingMeta] = useState(false)
 
   const generateMeta = async () => {
     setGeneratingMeta(true)
