@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { PageHeader } from '../components/ui'
-import { TrendingUp, Star, DollarSign, BarChart3, Filter } from 'lucide-react'
+import { TrendingUp, Star, DollarSign, ChartBar as BarChart3, Filter } from 'lucide-react'
 
 const COUNTRIES = ['United States', 'United Kingdom', 'Canada', 'Australia', 'Germany', 'France', 'Japan']
 const CATEGORIES = ['Puzzles & Games', 'Coloring Books', 'Activity Books', "Children's Books", 'Crafts & Hobbies']

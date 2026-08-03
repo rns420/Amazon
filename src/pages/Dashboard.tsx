@@ -5,7 +5,7 @@ import { useAuth } from '../lib/auth'
 import { PageHeader, StatCard, EmptyState, Spinner } from '../components/ui'
 import { WORKFLOW_STAGES } from '../lib/constants'
 import { Project, ActivityEntry } from '../lib/types'
-import { FolderKanban, BookCheck, FileEdit, Rocket, Plus, ArrowRight, Activity, CheckCircle2, Clock } from 'lucide-react'
+import { FolderKanban, BookCheck, File as FileEdit, Rocket, Plus, ArrowRight, Activity, CircleCheck as CheckCircle2, Clock } from 'lucide-react'
 
 export default function Dashboard() {
   const { user } = useAuth()

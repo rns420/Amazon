@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback, ReactNode } from 'react'
-import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react'
+import { CircleCheck as CheckCircle2, CircleAlert as AlertCircle, Info, X } from 'lucide-react'
 
 type ToastType = 'success' | 'error' | 'info'
 interface Toast { id: number; type: ToastType; message: string }

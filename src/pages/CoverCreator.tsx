@@ -4,7 +4,7 @@ import { KDP_TRIM_SIZES, trimById, PAPERBACK_BLEED } from '../lib/constants'
 import { downloadCoverPDF } from '../lib/pdf'
 import { validateCoverCompliance } from '../lib/validators'
 import { PageHeader } from '../components/ui'
-import { Download, BookImage, CheckCircle2, AlertCircle } from 'lucide-react'
+import { Download, BookImage, CircleCheck as CheckCircle2, CircleAlert as AlertCircle } from 'lucide-react'
 
 const THEMES = [{ id: 'minimal', label: 'Minimal' }, { id: 'bold', label: 'Bold' }, { id: 'elegant', label: 'Elegant' }, { id: 'playful', label: 'Playful' }]
 const COLORS = ['#3478f6', '#f97316', '#22c55e', '#dc2626', '#7c3aed', '#0891b2', '#1e293b', '#f43f5e']

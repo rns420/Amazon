@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../lib/auth'
 import { PageHeader, StatCard, Spinner } from '../components/ui'
-import { FolderKanban, Activity, AlertCircle } from 'lucide-react'
+import { FolderKanban, Activity, CircleAlert as AlertCircle } from 'lucide-react'
 
 export default function AdminPanel() {
   const { user } = useAuth()

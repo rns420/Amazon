@@ -1,10 +1,6 @@
 import { ReactNode, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import {
-  LayoutDashboard, FolderKanban, Grid3x3, Palette, BookImage, FileText,
-  TrendingUp, Search, KeyRound, Image, Layers, BarChart3, Settings,
-  Shield, User, LogOut, Menu, X, Sun, Moon, BookOpen
-} from 'lucide-react'
+import { LayoutDashboard, FolderKanban, Grid3x3, Palette, BookImage, FileText, TrendingUp, Search, KeyRound, Image, Layers, ChartBar as BarChart3, Settings, Shield, User, LogOut, Menu, X, Sun, Moon, BookOpen } from 'lucide-react'
 import { useTheme } from '../lib/theme'
 import { useAuth } from '../lib/auth'
 

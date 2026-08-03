@@ -9,7 +9,7 @@ import { Spinner } from '../components/ui'
 import { downloadInteriorPDF, downloadCoverPDF } from '../lib/pdf'
 import { validateCompliance, runQualityChecks } from '../lib/validators'
 import { generateMetadata } from '../lib/metadata'
-import { CheckCircle2, Circle, Clock, ChevronRight, ArrowLeft, Download, FileText, ShieldCheck, Gauge, Save, History } from 'lucide-react'
+import { CircleCheck as CheckCircle2, Circle, Clock, ChevronRight, ArrowLeft, Download, FileText, ShieldCheck, Gauge, Save, History } from 'lucide-react'
 
 export default function ProjectDetail() {
   const { id } = useParams<{ id: string }>()

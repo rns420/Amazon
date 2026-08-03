@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { PageHeader, StatCard, Spinner } from '../components/ui'
 import { WORKFLOW_STAGES } from '../lib/constants'
-import { FolderKanban, BookCheck, Rocket, FileEdit, TrendingUp, Clock } from 'lucide-react'
+import { FolderKanban, BookCheck, Rocket, File as FileEdit, TrendingUp, Clock } from 'lucide-react'
 
 export default function Analytics() {
   const [projects, setProjects] = useState<any[]>([])
