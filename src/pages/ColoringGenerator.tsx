@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useToast } from '../lib/toast'
 import { COLORING_THEMES, KDP_TRIM_SIZES } from '../lib/constants'
+import { downloadColoringPDF } from '../lib/pdf'
 import { PageHeader } from '../components/ui'
 import { Palette, Download, RefreshCw } from 'lucide-react'
 
@@ -14,12 +15,29 @@ export default function ColoringGenerator() {
   const [trimSize, setTrimSize] = useState('8.5x8.5')
   const [singleSided, setSingleSided] = useState(true)
   const [seed, setSeed] = useState(0)
+  const [exporting, setExporting] = useState(false)
   const patterns = generateColoringPattern(theme, seed)
+
+  const handleExport = () => {
+    setExporting(true)
+    try {
+      downloadColoringPDF({
+        theme, pageCount, trimSize, largePrint: audience === 'children',
+        singleSided, title: `${COLORING_THEMES.find((t) => t.id === theme)?.label} Coloring Book`,
+        author: 'Author Name',
+      })
+      notify('Coloring book PDF exported.', 'success')
+    } catch {
+      notify('Failed to export PDF.', 'error')
+    } finally {
+      setExporting(false)
+    }
+  }
 
   return (
     <div className="p-6 lg:p-8 max-w-7xl mx-auto animate-fade-in">
       <PageHeader title="Coloring Book Generator" subtitle="Create printable coloring book interiors with clean line art"
-        actions={<button onClick={() => notify('Coloring book PDF export uses the interior generator.', 'info')} className="btn-primary"><Download className="w-4 h-4" /> Export PDF</button>} />
+        actions={<button onClick={handleExport} disabled={exporting} className="btn-primary"><Download className="w-4 h-4" /> {exporting ? 'Exporting\u2026' : 'Export PDF'}</button>} />
 
       <div className="grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1 space-y-4">
@@ -41,7 +59,7 @@ export default function ColoringGenerator() {
                 {patterns.map((d, i) => (<path key={i} d={d} fill="none" stroke="#1e293b" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />))}
               </svg>
             </div>
-            <p className="text-xs text-fg-muted mt-3 text-center">Preview is a sample line-art pattern. The exported PDF includes {pageCount} pages of {COLORING_THEMES.find((t) => t.id === theme)?.label.toLowerCase()} designs{singleSided ? ' (single-sided)' : ''}.</p>
+            <p className="text-xs text-fg-muted mt-3 text-center">The exported PDF includes {pageCount} pages of {COLORING_THEMES.find((t) => t.id === theme)?.label.toLowerCase()} designs{singleSided ? ' (single-sided)' : ' (double-sided)'} with title and copyright pages.</p>
           </div>
         </div>
       </div>

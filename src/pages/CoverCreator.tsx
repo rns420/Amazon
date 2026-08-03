@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useToast } from '../lib/toast'
-import { KDP_TRIM_SIZES, trimById, PAPERBACK_BLEED } from '../lib/constants'
+import { KDP_TRIM_SIZES, trimById, PAPERBACK_BLEED, calculateSpineWidth, canHaveSpineText } from '../lib/constants'
 import { downloadCoverPDF } from '../lib/pdf'
 import { validateCoverCompliance } from '../lib/validators'
 import { PageHeader } from '../components/ui'
@@ -20,7 +20,7 @@ export default function CoverCreator() {
   const [pageCount, setPageCount] = useState(100)
 
   const trim = trimById(trimSize)
-  const spineWidth = Math.max(0.0625, pageCount * 0.002252)
+  const spineWidth = calculateSpineWidth(pageCount)
   const issues = validateCoverCompliance({ trimSize, title, author, subtitle, primaryColor, pageCount, theme })
 
   const handleExport = () => {
@@ -86,7 +86,7 @@ export default function CoverCreator() {
 
 function CoverPreview({ trimSize, title, subtitle, author, primaryColor, theme, pageCount }: any) {
   const trim = trimById(trimSize)
-  const spineWidth = Math.max(0.0625, pageCount * 0.002252)
+  const spineWidth = calculateSpineWidth(pageCount)
   const scale = 2.2
   const fw = trim.w * scale
   const fh = trim.h * scale
