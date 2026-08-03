@@ -79,7 +79,7 @@ export function validateCompliance(config: PuzzleExportConfig): ValidationIssue[
     issues.push({ level: 'pass', field: 'Page Parity', message: 'Page count is even (required by KDP).' })
   }
 
-  issues.push({ level: 'pass', field: 'Puzzle Solvability', message: 'All generated puzzles include verified solutions.' })
+  issues.push({ level: 'pass', field: 'Puzzle Solvability', message: 'Each puzzle is generated with an embedded solution via the generator algorithms.' })
 
   if (config.wordList && config.wordList.length > 0) {
     const tooLong = config.wordList.filter((w) => w.length > (config.largePrint ? 10 : 14))
@@ -139,22 +139,36 @@ export interface QualityCheck {
 
 export function runQualityChecks(config: PuzzleExportConfig): { checks: QualityCheck[]; score: number } {
   const checks: QualityCheck[] = []
+  const puzzleCount = Math.max(1, Math.floor(config.pageCount / 2))
 
-  checks.push({ field: 'Duplicate Puzzles', status: 'pass', message: 'Each puzzle is randomly generated; duplicates are statistically improbable.' })
-  checks.push({ field: 'Puzzle Solvability', status: 'pass', message: 'All puzzles have verified solutions included.' })
-  checks.push({ field: 'Solution Pages', status: 'pass', message: 'Solution section included at end of book.' })
-  checks.push({ field: 'Page Numbering', status: 'pass', message: 'Sequential page numbers applied to all content pages.' })
-  checks.push({ field: 'Layout Integrity', status: 'pass', message: 'All elements positioned within KDP-compliant margins.' })
-  checks.push({ field: 'Margins', status: 'pass', message: 'Interior margins meet KDP minimums (0.375" outer, 0.125" gutter).' })
-  checks.push({ field: 'Print Quality', status: 'pass', message: 'Vector-based content renders at 300+ DPI print resolution.' })
+  checks.push({ field: 'Puzzle Count', status: puzzleCount >= 10 ? 'pass' : 'warning', message: `${puzzleCount} puzzles will be generated from ${config.pageCount} pages.` })
+  checks.push({ field: 'Solution Pages', status: 'pass', message: 'Solution section included at end of book (generated after puzzle pages).' })
+  checks.push({ field: 'Page Numbering', status: 'pass', message: 'Sequential page numbers applied to all content pages in the PDF generator.' })
 
-  if (config.title && config.title.trim().length > 0) {
-    checks.push({ field: 'Title Spelling', status: 'pass', message: 'No obvious spelling issues in title.' })
+  const margins = config.largePrint ? KDP_INTERIOR_MARGINS.largePrint : KDP_INTERIOR_MARGINS.noBleed
+  const marginOk = margins.outer >= 0.375 && margins.gutter >= 0.125
+  checks.push({ field: 'Margins', status: marginOk ? 'pass' : 'warning', message: `Interior margins: ${margins.outer}" outer, ${margins.gutter}" gutter ${marginOk ? '\u2014 meets KDP minimums' : '\u2014 check KDP requirements'}.` })
+
+  const trim = trimById(config.trimSize)
+  if (trim) {
+    checks.push({ field: 'Layout Integrity', status: 'pass', message: `Grid sized to fit within ${trim.label} trim (${trim.w}" x ${trim.h}") with margins.` })
   } else {
-    checks.push({ field: 'Title Spelling', status: 'warning', message: 'Title is empty.' })
+    checks.push({ field: 'Layout Integrity', status: 'fail', message: 'Invalid trim size \u2014 layout cannot be calculated.' })
   }
 
-  checks.push({ field: 'Cropped Images', status: 'pass', message: 'No cropped content detected; all elements within page boundaries.' })
+  checks.push({ field: 'Print Quality', status: 'pass', message: 'PDF generated with jsPDF vector primitives \u2014 resolution-independent for print.' })
+
+  if (config.title && config.title.trim().length > 0) {
+    const hasPlaceholder = /sample|placeholder|lorem|test|untitled|draft/i.test(config.title)
+    checks.push({ field: 'Title Check', status: hasPlaceholder ? 'warning' : 'pass', message: hasPlaceholder ? 'Title may contain placeholder text.' : 'Title is set and does not contain placeholder keywords.' })
+  } else {
+    checks.push({ field: 'Title Check', status: 'warning', message: 'Title is empty.' })
+  }
+
+  if (config.puzzleType === 'wordsearch' && config.wordList && config.wordList.length > 0) {
+    const unique = new Set(config.wordList.map((w) => w.toUpperCase()))
+    checks.push({ field: 'Word Uniqueness', status: unique.size === config.wordList.length ? 'pass' : 'warning', message: unique.size === config.wordList.length ? 'All words in the list are unique.' : `${config.wordList.length - unique.size} duplicate word(s) found in the list.` })
+  }
 
   if (config.pageCount >= 100) {
     checks.push({ field: 'Book Length', status: 'pass', message: `Book length (${config.pageCount} pages) is competitive for the category.` })
@@ -170,7 +184,7 @@ export function runQualityChecks(config: PuzzleExportConfig): { checks: QualityC
 
   if (config.wordList && config.wordList.length < 5) {
     checks.push({ field: 'Word Variety', status: 'warning', message: 'Word list has fewer than 5 words; puzzles may feel repetitive.' })
-  } else {
+  } else if (config.wordList && config.wordList.length >= 5) {
     checks.push({ field: 'Word Variety', status: 'pass', message: 'Sufficient word variety for diverse puzzles.' })
   }
 

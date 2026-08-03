@@ -23,7 +23,8 @@ export default function Projects() {
     let q = supabase.from('projects').select('*').order('updated_at', { ascending: false })
     if (filter === 'archived') q = q.eq('archived', true)
     else q = q.eq('archived', false)
-    const { data } = await q
+    const { data, error } = await q
+    if (error) notify('Failed to load projects.', 'error')
     setProjects((data ?? []) as Project[])
     setLoading(false)
   }
@@ -36,23 +37,26 @@ export default function Projects() {
   )
 
   const duplicate = async (p: Project) => {
-    const { data } = await supabase.from('projects').insert({
+    const { data, error } = await supabase.from('projects').insert({
       user_id: user!.id, title: `${p.title} (Copy)`, book_type: p.book_type,
       status: 'draft', current_stage: 'market-research', stage_progress: {},
       config: p.config, metadata: p.metadata, cover_config: p.cover_config,
     }).select().single()
-    if (data) { notify('Project duplicated.', 'success'); load() }
+    if (error) { notify('Failed to duplicate project.', 'error'); return }
+    notify('Project duplicated.', 'success'); load()
   }
 
   const archive = async (p: Project) => {
-    await supabase.from('projects').update({ archived: !p.archived }).eq('id', p.id)
+    const { error } = await supabase.from('projects').update({ archived: !p.archived }).eq('id', p.id)
+    if (error) { notify('Failed to update project.', 'error'); return }
     notify(p.archived ? 'Project restored.' : 'Project archived.', 'success')
     load()
   }
 
   const remove = async (p: Project) => {
     if (!confirm(`Delete "${p.title}"? This cannot be undone.`)) return
-    await supabase.from('projects').delete().eq('id', p.id)
+    const { error } = await supabase.from('projects').delete().eq('id', p.id)
+    if (error) { notify('Failed to delete project.', 'error'); return }
     notify('Project deleted.', 'success')
     load()
   }

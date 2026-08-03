@@ -17,7 +17,8 @@ export default function TemplateLibrary() {
 
   const load = async () => {
     setLoading(true)
-    const { data } = await supabase.from('templates').select('*').order('created_at', { ascending: false })
+    const { data, error } = await supabase.from('templates').select('*').order('created_at', { ascending: false })
+    if (error) notify('Failed to load templates.', 'error')
     setTemplates((data ?? []) as Template[])
     setLoading(false)
   }
@@ -26,7 +27,8 @@ export default function TemplateLibrary() {
 
   const remove = async (t: Template) => {
     if (t.is_builtin) { notify('Built-in templates cannot be deleted.', 'error'); return }
-    await supabase.from('templates').delete().eq('id', t.id)
+    const { error } = await supabase.from('templates').delete().eq('id', t.id)
+    if (error) { notify('Failed to delete template.', 'error'); return }
     notify('Template deleted.', 'success')
     load()
   }

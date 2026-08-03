@@ -16,15 +16,17 @@ export default function Settings() {
 
   useEffect(() => {
     (async () => {
-      const { data } = await supabase.from('profiles').select('preferences').eq('id', user!.id).maybeSingle()
+      const { data, error } = await supabase.from('profiles').select('preferences').eq('id', user!.id).maybeSingle()
+      if (error) { setLoading(false); return }
       setPrefs(data?.preferences ?? {})
       setLoading(false)
     })()
   }, [user])
 
   const save = async (newPrefs: any) => {
+    const { error } = await supabase.from('profiles').upsert({ id: user!.id, preferences: newPrefs })
+    if (error) { notify('Failed to save settings.', 'error'); return }
     setPrefs(newPrefs)
-    await supabase.from('profiles').upsert({ id: user!.id, preferences: newPrefs })
     notify('Settings saved.', 'success')
   }
 

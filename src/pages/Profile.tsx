@@ -15,7 +15,8 @@ export default function Profile() {
 
   useEffect(() => {
     (async () => {
-      const { data } = await supabase.from('profiles').select('*').eq('id', user!.id).maybeSingle()
+      const { data, error } = await supabase.from('profiles').select('*').eq('id', user!.id).maybeSingle()
+      if (error) { setLoading(false); return }
       setDisplayName(data?.display_name ?? '')
       setAvatarUrl(data?.avatar_url ?? '')
       setLoading(false)
@@ -24,8 +25,9 @@ export default function Profile() {
 
   const save = async () => {
     setSaving(true)
-    await supabase.from('profiles').upsert({ id: user!.id, display_name: displayName, avatar_url: avatarUrl })
+    const { error } = await supabase.from('profiles').upsert({ id: user!.id, display_name: displayName, avatar_url: avatarUrl })
     setSaving(false)
+    if (error) { notify('Failed to update profile.', 'error'); return }
     notify('Profile updated.', 'success')
   }
 
