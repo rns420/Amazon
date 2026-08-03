@@ -131,37 +131,49 @@ Return 5 competitors. Return ONLY the JSON, no other text.`;
   return "Invalid research type.";
 }
 
-async function callAI(prompt: string): Promise<string> {
-  const apiKey = Deno.env.get("ANTHROPIC_API_KEY");
-  if (!apiKey) throw new Error("AI API key not configured");
+const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
+const PRIMARY_MODEL = "anthropic/claude-3.5-sonnet";
+const FALLBACK_MODEL = "google/gemini-flash-1.5";
 
-  const baseUrl = Deno.env.get("ANTHROPIC_BASE_URL") ?? "https://api.anthropic.com";
-  const model = Deno.env.get("ANTHROPIC_SMALL_FAST_MODEL") ?? "claude-3-5-sonnet-20241022";
+async function callOpenRouter(prompt: string, model: string): Promise<string> {
+  const apiKey = Deno.env.get("OPENROUTER_API_KEY");
+  if (!apiKey) throw new Error("OPENROUTER_API_KEY secret is not configured");
 
-  const response = await fetch(`${baseUrl}/v1/messages`, {
+  const response = await fetch(OPENROUTER_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01",
+      "Authorization": `Bearer ${apiKey}`,
+      "HTTP-Referer": "https://kdp-studio.app",
+      "X-Title": "KDP Publishing Studio",
     },
     body: JSON.stringify({
       model,
       max_tokens: 4096,
       messages: [{ role: "user", content: prompt }],
+      response_format: { type: "json_object" },
     }),
   });
 
   if (!response.ok) {
     const errText = await response.text();
-    throw new Error(`AI request failed (${response.status}): ${errText}`);
+    throw new Error(`OpenRouter request failed (${response.status}): ${errText}`);
   }
 
   const data = await response.json();
-  const text = data.content?.[0]?.text;
+  const text = data.choices?.[0]?.message?.content;
   if (!text) throw new Error("AI returned empty response");
 
   return text;
+}
+
+async function callAI(prompt: string): Promise<string> {
+  try {
+    return await callOpenRouter(prompt, PRIMARY_MODEL);
+  } catch (primaryErr) {
+    console.log(`Primary model (${PRIMARY_MODEL}) failed: ${primaryErr.message}. Falling back to ${FALLBACK_MODEL}.`);
+    return await callOpenRouter(prompt, FALLBACK_MODEL);
+  }
 }
 
 function extractJSON(text: string): any {
